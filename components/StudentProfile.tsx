@@ -170,7 +170,7 @@ const StudentProfile: React.FC<StudentProfileProps> = ({
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 text-center relative group">
             <button
               onClick={() => onEditStudent(student)}
-              className="absolute top-4 right-4 p-2 bg-slate-50 text-slate-400 rounded-full hover:bg-amber-50 hover:text-amber-600 transition-all opacity-0 group-hover:opacity-100"
+              className="absolute top-4 right-4 p-2 bg-slate-50 text-slate-400 rounded-full hover:bg-amber-50 hover:text-amber-600 transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100"
               title="Editar Aluno"
             >
               <Edit3 className="w-5 h-5" />
@@ -349,7 +349,7 @@ const StudentProfile: React.FC<StudentProfileProps> = ({
                         )}
                       </div>
 
-                      <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                      <div className="flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all">
                         <button
                           onClick={() => onEditLesson(lesson)}
                           className="p-1.5 text-slate-400 hover:text-amber-500 hover:bg-amber-50 rounded-lg transition-colors"

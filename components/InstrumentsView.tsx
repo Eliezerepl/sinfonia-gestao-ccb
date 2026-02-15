@@ -44,21 +44,21 @@ const InstrumentsView: React.FC<InstrumentsViewProps> = ({ instruments, onAdd, o
             <h3 className="font-bold text-slate-900 flex items-center mb-2">
               <Plus className="w-5 h-5 mr-2 text-blue-500" /> Novo Instrumento
             </h3>
-            
+
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1">Nome</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={name}
                 onChange={e => setName(e.target.value)}
                 placeholder="Ex: Violoncelo"
-                className="w-full border border-slate-200 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none" 
+                className="w-full border border-slate-200 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
 
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1">Família</label>
-              <select 
+              <select
                 value={family}
                 onChange={e => setFamily(e.target.value as InstrumentFamily)}
                 className="w-full border border-slate-200 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none bg-white"
@@ -69,7 +69,7 @@ const InstrumentsView: React.FC<InstrumentsViewProps> = ({ instruments, onAdd, o
               </select>
             </div>
 
-            <button 
+            <button
               type="submit"
               className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-100 flex items-center justify-center"
             >
@@ -99,9 +99,9 @@ const InstrumentsView: React.FC<InstrumentsViewProps> = ({ instruments, onAdd, o
                       </span>
                     </div>
                   </div>
-                  <button 
+                  <button
                     onClick={() => onDelete(instrument.id)}
-                    className="p-2 text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                    className="p-2 text-slate-300 hover:text-red-500 transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100"
                     title="Remover instrumento"
                   >
                     <Trash2 className="w-5 h-5" />

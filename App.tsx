@@ -404,27 +404,27 @@ const App: React.FC = () => {
           </div>
         </header>
 
-        <main className="flex-grow p-4 md:p-8 max-w-7xl w-full mx-auto">
+        <main className="flex-grow p-4 md:p-8 max-w-7xl w-full mx-auto pb-24 md:pb-8">
           {renderContent()}
         </main>
 
         {/* Mobile Bottom Navigation */}
-        <nav className="md:hidden bg-white border-t border-slate-200 sticky bottom-0 z-30 flex justify-around p-2">
-          <button onClick={() => navigateTo('dashboard')} className={`p-2 flex flex-col items-center ${currentView === 'dashboard' ? 'text-blue-600' : 'text-slate-400'}`}>
+        <nav className="md:hidden bg-white border-t border-slate-200 fixed bottom-0 left-0 right-0 z-30 flex justify-around items-center p-2 pb-safe shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+          <button onClick={() => navigateTo('dashboard')} className={`flex-1 py-1 flex flex-col items-center transition-colors ${currentView === 'dashboard' ? 'text-blue-600' : 'text-slate-400'}`}>
             <LayoutDashboard className="w-6 h-6" />
-            <span className="text-[10px] mt-1">Home</span>
+            <span className="text-[10px] mt-1 font-medium">Home</span>
           </button>
-          <button onClick={() => navigateTo('teachers')} className={`p-2 flex flex-col items-center ${currentView === 'teachers' ? 'text-blue-600' : 'text-slate-400'}`}>
+          <button onClick={() => navigateTo('teachers')} className={`flex-1 py-1 flex flex-col items-center transition-colors ${currentView === 'teachers' ? 'text-blue-600' : 'text-slate-400'}`}>
             <Users className="w-6 h-6" />
-            <span className="text-[10px] mt-1">Prof</span>
+            <span className="text-[10px] mt-1 font-medium">Prof</span>
           </button>
-          <button onClick={() => navigateTo('instruments')} className={`p-2 flex flex-col items-center ${currentView === 'instruments' ? 'text-blue-600' : 'text-slate-400'}`}>
-            <Settings className="w-6 h-6" />
-            <span className="text-[10px] mt-1">Inst</span>
+          <button onClick={() => navigateTo('methods_management')} className={`flex-1 py-1 flex flex-col items-center transition-colors ${currentView === 'methods_management' ? 'text-blue-600' : 'text-slate-400'}`}>
+            <BookOpen className="w-6 h-6" />
+            <span className="text-[10px] mt-1 font-medium">Métodos</span>
           </button>
-          <button onClick={() => navigateTo('methods_progress')} className={`p-2 flex flex-col items-center ${currentView === 'methods_progress' ? 'text-blue-600' : 'text-slate-400'}`}>
+          <button onClick={() => navigateTo('methods_progress')} className={`flex-1 py-1 flex flex-col items-center transition-colors ${currentView === 'methods_progress' ? 'text-blue-600' : 'text-slate-400'}`}>
             <Library className="w-6 h-6" />
-            <span className="text-[10px] mt-1">Prog</span>
+            <span className="text-[10px] mt-1 font-medium">Prog</span>
           </button>
         </nav>
 

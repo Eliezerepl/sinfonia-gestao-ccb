@@ -126,8 +126,8 @@ const TeachersView: React.FC<TeachersViewProps> = ({ teachers, availableInstrume
                                         <div
                                             onClick={() => toggleInstrument(inst)}
                                             className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${selectedInstruments.includes(inst)
-                                                    ? 'bg-blue-600 border-blue-600'
-                                                    : 'bg-white border-slate-300 group-hover:border-blue-400'
+                                                ? 'bg-blue-600 border-blue-600'
+                                                : 'bg-white border-slate-300 group-hover:border-blue-400'
                                                 }`}
                                         >
                                             {selectedInstruments.includes(inst) && <Check className="w-3 h-3 text-white" />}
@@ -143,8 +143,8 @@ const TeachersView: React.FC<TeachersViewProps> = ({ teachers, availableInstrume
                         <button
                             type="submit"
                             className={`w-full py-2.5 rounded-lg font-semibold transition-all shadow-lg flex items-center justify-center active:scale-95 ${editingTeacher
-                                    ? 'bg-amber-500 text-white hover:bg-amber-600 shadow-amber-100'
-                                    : 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-100'
+                                ? 'bg-amber-500 text-white hover:bg-amber-600 shadow-amber-100'
+                                : 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-100'
                                 }`}
                         >
                             {editingTeacher ? (
@@ -192,14 +192,14 @@ const TeachersView: React.FC<TeachersViewProps> = ({ teachers, availableInstrume
                                     <div className="flex gap-2">
                                         <button
                                             onClick={() => startEdit(teacher)}
-                                            className="p-2 text-slate-300 hover:text-amber-500 transition-colors opacity-0 group-hover:opacity-100"
+                                            className="p-2 text-slate-300 hover:text-amber-500 transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100"
                                             title="Editar informações"
                                         >
                                             <Edit3 className="w-5 h-5" />
                                         </button>
                                         <button
                                             onClick={() => onDelete(teacher.id)}
-                                            className="p-2 text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                                            className="p-2 text-slate-300 hover:text-red-500 transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100"
                                             title="Remover professor"
                                         >
                                             <Trash2 className="w-5 h-5" />

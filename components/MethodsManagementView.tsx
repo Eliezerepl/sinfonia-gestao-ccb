@@ -197,7 +197,7 @@ const MethodsManagementView: React.FC<MethodsManagementViewProps> = ({ methods, 
                   </div>
                   <button
                     onClick={() => onDelete(method.id)}
-                    className="p-2 text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                    className="p-2 text-slate-300 hover:text-red-500 transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100"
                     title="Excluir método"
                   >
                     <Trash2 className="w-5 h-5" />
