@@ -43,7 +43,8 @@ export const storageService = {
       totalLessons: m.total_lessons,
       totalExercises: m.total_exercises,
       hasPhases: m.has_phases,
-      totalPhases: m.total_phases
+      totalPhases: m.total_phases,
+      instrument: m.instrument
     }));
   },
 
@@ -54,7 +55,8 @@ export const storageService = {
       total_lessons: method.totalLessons,
       total_exercises: method.totalExercises,
       has_phases: method.hasPhases,
-      total_phases: method.totalPhases
+      total_phases: method.totalPhases,
+      instrument: method.instrument || 'Todos'
     };
     const { data, error } = await supabase
       .from('methods')

@@ -243,6 +243,7 @@ const App: React.FC = () => {
       case 'methods_management':
         return <MethodsManagementView
           methods={methods}
+          availableInstruments={instruments.map(i => i.name)}
           onAdd={handleAddMethod}
           onDelete={handleDeleteMethod}
         />;
@@ -392,6 +393,7 @@ const App: React.FC = () => {
       {isNewLessonModalOpen && (
         <NewLessonModal
           methods={methods}
+          studentInstrument={selectedStudent?.instrument}
           onClose={() => setIsNewLessonModalOpen(false)}
           onSave={handleAddLesson}
         />

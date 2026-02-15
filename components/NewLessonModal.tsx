@@ -1,18 +1,26 @@
-
-import React, { useState } from 'react';
-import { Lesson, Evaluation, MethodEntity } from '../types';
-import { X, CheckCircle, Save, Info, Book } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Lesson, MethodEntity } from '../types';
+import { X, CheckCircle, Save, Book } from 'lucide-react';
 
 interface NewLessonModalProps {
   methods: MethodEntity[];
+  studentInstrument?: string;
   onClose: () => void;
   onSave: (lesson: Partial<Lesson>) => void;
 }
 
-const NewLessonModal: React.FC<NewLessonModalProps> = ({ methods, onClose, onSave }) => {
+const NewLessonModal: React.FC<NewLessonModalProps> = ({ methods, studentInstrument, onClose, onSave }) => {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [present, setPresent] = useState(true);
   const [observation, setObservation] = useState('');
+
+  const filteredMethods = useMemo(() => {
+    return methods.filter(m =>
+      m.instrument === 'Todos' ||
+      m.instrument === studentInstrument ||
+      !m.instrument
+    );
+  }, [methods, studentInstrument]);
 
   // Method 1
   const [selectedMethod1, setSelectedMethod1] = useState('');
@@ -128,7 +136,7 @@ const NewLessonModal: React.FC<NewLessonModalProps> = ({ methods, onClose, onSav
                         className="w-full border border-slate-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white transition-all overflow-hidden text-ellipsis font-semibold"
                       >
                         <option value="">Selecione o Método 1</option>
-                        {methods.map(m => (
+                        {filteredMethods.map(m => (
                           <option key={m.id} value={m.name}>{m.name}</option>
                         ))}
                       </select>
@@ -187,7 +195,7 @@ const NewLessonModal: React.FC<NewLessonModalProps> = ({ methods, onClose, onSav
                         className="w-full border border-slate-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white transition-all overflow-hidden text-ellipsis font-semibold"
                       >
                         <option value="">Selecione o Método 2</option>
-                        {methods.map(m => (
+                        {filteredMethods.map(m => (
                           <option key={m.id} value={m.name}>{m.name}</option>
                         ))}
                       </select>

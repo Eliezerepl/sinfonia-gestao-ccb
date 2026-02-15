@@ -215,20 +215,59 @@ const StudentProfile: React.FC<StudentProfileProps> = ({
 
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
             <h3 className="font-bold text-slate-900 mb-4 flex items-center">
-              <BookOpen className="w-5 h-5 mr-2 text-blue-500" /> Domínio de Métodos
+              <BookOpen className="w-5 h-5 mr-2 text-blue-500" /> Matriz de Desenvolvimento
             </h3>
-            <div className="space-y-4">
+
+            <div className="space-y-6">
+              {/* MSA Progress */}
               <div>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-slate-600">Exercícios Concluídos</span>
-                  <span className="font-bold text-blue-600">
-                    {student.lessons.reduce((acc, curr) => acc + curr.exercisesMastered.length, 0)}
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 flex justify-between">
+                  <span>Base (MSA/Teoria)</span>
+                  <span className="text-blue-500">
+                    {Array.from(new Set(student.lessons.flatMap(l => l.exercisesMastered)))
+                      .filter((ex: any) => ex.toString().toUpperCase().includes('MSA')).length} itens
                   </span>
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {Array.from(new Set(student.lessons.flatMap(l => l.exercisesMastered)))
+                    .filter((ex: any) => ex.toString().toUpperCase().includes('MSA'))
+                    .map((ex: any) => (
+                      <span key={ex} className="text-[9px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-100 font-bold uppercase">
+                        {ex}
+                      </span>
+                    ))}
+                  {student.lessons.flatMap(l => l.exercisesMastered).filter((ex: any) => ex.toString().toUpperCase().includes('MSA')).length === 0 && (
+                    <span className="text-[10px] text-slate-400 italic">Iniciando base teórica...</span>
+                  )}
                 </div>
               </div>
+
+              {/* Instrument Progress */}
               <div>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 flex justify-between">
+                  <span>Métodos de {student.instrument}</span>
+                  <span className="text-orange-500">
+                    {Array.from(new Set(student.lessons.flatMap(l => l.exercisesMastered)))
+                      .filter((ex: any) => !ex.toString().toUpperCase().includes('MSA')).length} itens
+                  </span>
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {Array.from(new Set(student.lessons.flatMap(l => l.exercisesMastered)))
+                    .filter((ex: any) => !ex.toString().toUpperCase().includes('MSA'))
+                    .map((ex: any) => (
+                      <span key={ex} className="text-[9px] bg-orange-50 text-orange-700 px-2 py-0.5 rounded border border-orange-100 font-bold uppercase">
+                        {ex}
+                      </span>
+                    ))}
+                  {student.lessons.flatMap(l => l.exercisesMastered).filter((ex: any) => !ex.toString().toUpperCase().includes('MSA')).length === 0 && (
+                    <span className="text-[10px] text-slate-400 italic">Iniciando métodos técnicos...</span>
+                  )}
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-slate-50">
                 <div className="flex justify-between text-sm mb-1">
-                  <span className="text-slate-600">Hinos Aprendidos</span>
+                  <span className="text-slate-600 font-medium">Hinos Aprendidos</span>
                   <span className="font-bold text-green-600">
                     {student.lessons.reduce((acc, curr) => acc + curr.hymnsMastered.length, 0)}
                   </span>
