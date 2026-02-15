@@ -149,26 +149,30 @@ const NewLessonModal: React.FC<NewLessonModalProps> = ({ methods, onClose, onSav
                           />
                         </div>
                       )}
-                      <div>
-                        <label className="text-[10px] text-slate-500 block mb-1 font-bold uppercase">Lição</label>
-                        <input
-                          type="number"
-                          value={lesson1}
-                          onChange={e => setLesson1(e.target.value)}
-                          placeholder={`Max ${methods.find(m => m.name === selectedMethod1)?.totalLessons || '?'}`}
-                          className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[10px] text-slate-500 block mb-1 font-bold uppercase">Exercício</label>
-                        <input
-                          type="number"
-                          value={exercise1}
-                          onChange={e => setExercise1(e.target.value)}
-                          placeholder={`Max ${methods.find(m => m.name === selectedMethod1)?.totalExercises || '?'}`}
-                          className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium"
-                        />
-                      </div>
+                      {selectedMethod1.toUpperCase() !== 'MSA' && (
+                        <>
+                          <div>
+                            <label className="text-[10px] text-slate-500 block mb-1 font-bold uppercase">Lição</label>
+                            <input
+                              type="number"
+                              value={lesson1}
+                              onChange={e => setLesson1(e.target.value)}
+                              placeholder={`Max ${methods.find(m => m.name === selectedMethod1)?.totalLessons || '?'}`}
+                              className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] text-slate-500 block mb-1 font-bold uppercase">Exercício</label>
+                            <input
+                              type="number"
+                              value={exercise1}
+                              onChange={e => setExercise1(e.target.value)}
+                              placeholder={`Max ${methods.find(m => m.name === selectedMethod1)?.totalExercises || '?'}`}
+                              className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium"
+                            />
+                          </div>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>
@@ -204,26 +208,30 @@ const NewLessonModal: React.FC<NewLessonModalProps> = ({ methods, onClose, onSav
                           />
                         </div>
                       )}
-                      <div>
-                        <label className="text-[10px] text-slate-500 block mb-1 font-bold uppercase">Lição</label>
-                        <input
-                          type="number"
-                          value={lesson2}
-                          onChange={e => setLesson2(e.target.value)}
-                          placeholder={`Max ${methods.find(m => m.name === selectedMethod2)?.totalLessons || '?'}`}
-                          className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[10px] text-slate-500 block mb-1 font-bold uppercase">Exercício</label>
-                        <input
-                          type="number"
-                          value={exercise2}
-                          onChange={e => setExercise2(e.target.value)}
-                          placeholder={`Max ${methods.find(m => m.name === selectedMethod2)?.totalExercises || '?'}`}
-                          className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium"
-                        />
-                      </div>
+                      {selectedMethod2.toUpperCase() !== 'MSA' && (
+                        <>
+                          <div>
+                            <label className="text-[10px] text-slate-500 block mb-1 font-bold uppercase">Lição</label>
+                            <input
+                              type="number"
+                              value={lesson2}
+                              onChange={e => setLesson2(e.target.value)}
+                              placeholder={`Max ${methods.find(m => m.name === selectedMethod2)?.totalLessons || '?'}`}
+                              className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] text-slate-500 block mb-1 font-bold uppercase">Exercício</label>
+                            <input
+                              type="number"
+                              value={exercise2}
+                              onChange={e => setExercise2(e.target.value)}
+                              placeholder={`Max ${methods.find(m => m.name === selectedMethod2)?.totalExercises || '?'}`}
+                              className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium"
+                            />
+                          </div>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>
