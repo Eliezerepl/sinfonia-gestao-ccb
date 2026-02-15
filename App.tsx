@@ -185,6 +185,15 @@ const App: React.FC = () => {
     }
   };
 
+  const handleUpdateTeacher = async (id: string, teacher: Partial<Teacher>) => {
+    try {
+      await storageService.updateTeacher(id, teacher);
+      await loadData();
+    } catch (error) {
+      alert('Erro ao atualizar professor');
+    }
+  };
+
   const navigateTo = (view: ViewState) => {
     setCurrentView(view);
     setSelectedStudentId(null);
@@ -252,6 +261,7 @@ const App: React.FC = () => {
           teachers={teachers}
           availableInstruments={instruments.map(i => i.name)}
           onAdd={handleAddTeacher}
+          onUpdate={handleUpdateTeacher}
           onDelete={handleDeleteTeacher}
         />;
       default:

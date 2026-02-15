@@ -66,7 +66,8 @@ export interface Student {
 export interface Teacher {
   id: string;
   name: string;
-  instrument: string;
+  instruments: string[];
+  role: string;
 }
 
 export interface DashboardStats {

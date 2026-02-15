@@ -82,17 +82,39 @@ export const storageService = {
       .select('*')
       .order('name');
     if (error) throw error;
-    return data || [];
+    return (data || []).map((t: any) => ({
+      ...t,
+      instruments: t.instruments || (t.instrument ? [t.instrument] : []),
+      role: t.role || 'Instrutor'
+    }));
   },
 
   saveTeacher: async (teacher: Omit<Teacher, 'id'>) => {
+    const dbData = {
+      name: teacher.name,
+      instruments: teacher.instruments,
+      role: teacher.role
+    };
     const { data, error } = await supabase
       .from('teachers')
-      .insert([teacher])
+      .insert([dbData])
       .select()
       .single();
     if (error) throw error;
     return data;
+  },
+
+  updateTeacher: async (id: string, teacher: Partial<Teacher>) => {
+    const dbData: any = {};
+    if (teacher.name) dbData.name = teacher.name;
+    if (teacher.instruments) dbData.instruments = teacher.instruments;
+    if (teacher.role) dbData.role = teacher.role;
+
+    const { error } = await supabase
+      .from('teachers')
+      .update(dbData)
+      .eq('id', id);
+    if (error) throw error;
   },
 
   deleteTeacher: async (id: string) => {
