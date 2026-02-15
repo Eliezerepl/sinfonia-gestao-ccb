@@ -391,6 +391,7 @@ const App: React.FC = () => {
       {/* Modals */}
       {isNewLessonModalOpen && (
         <NewLessonModal
+          methods={methods}
           onClose={() => setIsNewLessonModalOpen(false)}
           onSave={handleAddLesson}
         />
