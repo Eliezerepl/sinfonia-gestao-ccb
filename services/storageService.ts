@@ -69,6 +69,24 @@ export const storageService = {
     return data || [];
   },
 
+  saveTeacher: async (teacher: Omit<Teacher, 'id'>) => {
+    const { data, error } = await supabase
+      .from('teachers')
+      .insert([teacher])
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  deleteTeacher: async (id: string) => {
+    const { error } = await supabase
+      .from('teachers')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+  },
+
   // Students
   getStudents: async (): Promise<Student[]> => {
     const { data, error } = await supabase

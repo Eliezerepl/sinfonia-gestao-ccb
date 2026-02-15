@@ -23,8 +23,9 @@ import MethodsView from './components/MethodsView';
 import HymnsView from './components/HymnsView';
 import InstrumentsView from './components/InstrumentsView';
 import MethodsManagementView from './components/MethodsManagementView';
+import TeachersView from './components/TeachersView';
 
-type ViewState = 'dashboard' | 'methods_progress' | 'hymns' | 'instruments' | 'methods_management';
+type ViewState = 'dashboard' | 'methods_progress' | 'hymns' | 'instruments' | 'methods_management' | 'teachers';
 
 const App: React.FC = () => {
   const [students, setStudents] = useState<Student[]>([]);
@@ -152,6 +153,26 @@ const App: React.FC = () => {
     }
   };
 
+  const handleAddTeacher = async (teacher: Omit<Teacher, 'id'>) => {
+    try {
+      await storageService.saveTeacher(teacher);
+      await loadData();
+    } catch (error) {
+      alert('Erro ao salvar professor');
+    }
+  };
+
+  const handleDeleteTeacher = async (id: string) => {
+    if (window.confirm('Deseja realmente excluir este professor?')) {
+      try {
+        await storageService.deleteTeacher(id);
+        await loadData();
+      } catch (error) {
+        alert('Erro ao excluir professor');
+      }
+    }
+  };
+
   const navigateTo = (view: ViewState) => {
     setCurrentView(view);
     setSelectedStudentId(null);
@@ -185,6 +206,13 @@ const App: React.FC = () => {
           methods={methods}
           onAdd={handleAddMethod}
           onDelete={handleDeleteMethod}
+        />;
+      case 'teachers':
+        return <TeachersView
+          teachers={teachers}
+          availableInstruments={instruments.map(i => i.name)}
+          onAdd={handleAddTeacher}
+          onDelete={handleDeleteTeacher}
         />;
       default:
         return (
@@ -270,6 +298,12 @@ const App: React.FC = () => {
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentView === 'instruments' ? 'text-blue-600 bg-blue-50' : 'text-slate-500 hover:text-slate-900'}`}
                 >
                   Instrumentos
+                </button>
+                <button
+                  onClick={() => navigateTo('teachers')}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentView === 'teachers' ? 'text-blue-600 bg-blue-50' : 'text-slate-500 hover:text-slate-900'}`}
+                >
+                  Professores
                 </button>
               </nav>
               <button
