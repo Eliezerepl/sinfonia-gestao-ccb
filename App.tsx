@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Student, Teacher, InstrumentEntity, MethodEntity, LearningPhase } from './types';
+import { Student, Teacher, InstrumentEntity, MethodEntity, LearningPhase, Lesson } from './types';
 import { storageService } from './services/storageService';
 import {
   Users,
@@ -36,6 +36,8 @@ const App: React.FC = () => {
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [isNewLessonModalOpen, setIsNewLessonModalOpen] = useState(false);
   const [isNewStudentModalOpen, setIsNewStudentModalOpen] = useState(false);
+  const [studentToEdit, setStudentToEdit] = useState<Student | null>(null);
+  const [lessonToEdit, setLessonToEdit] = useState<Lesson | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Load initial data
@@ -82,11 +84,32 @@ const App: React.FC = () => {
     if (!selectedStudentId) return;
 
     try {
-      await storageService.addLesson(selectedStudentId, lessonData);
+      if (lessonToEdit) {
+        await storageService.updateLesson(lessonToEdit.id, lessonData);
+      } else {
+        await storageService.addLesson(selectedStudentId, lessonData);
+      }
       await loadData(); // Refresh data
       setIsNewLessonModalOpen(false);
+      setLessonToEdit(null);
     } catch (error) {
       alert('Erro ao salvar lição');
+    }
+  };
+
+  const handleEditLesson = (lesson: Lesson) => {
+    setLessonToEdit(lesson);
+    setIsNewLessonModalOpen(true);
+  };
+
+  const handleDeleteLesson = async (id: string) => {
+    if (window.confirm('Deseja realmente excluir este registro de aula?')) {
+      try {
+        await storageService.deleteLesson(id);
+        await loadData();
+      } catch (error) {
+        alert('Erro ao excluir aula');
+      }
     }
   };
 
@@ -117,12 +140,22 @@ const App: React.FC = () => {
 
   const handleAddNewStudent = async (studentData: any) => {
     try {
-      await storageService.saveStudent(studentData);
+      if (studentToEdit) {
+        await storageService.updateStudent(studentToEdit.id, studentData);
+      } else {
+        await storageService.saveStudent(studentData);
+      }
       await loadData();
       setIsNewStudentModalOpen(false);
+      setStudentToEdit(null);
     } catch (error) {
       alert('Erro ao salvar aluno');
     }
+  };
+
+  const handleEditStudent = (student: Student) => {
+    setStudentToEdit(student);
+    setIsNewStudentModalOpen(true);
   };
 
   const handleAddInstrument = async (inst: Omit<InstrumentEntity, 'id'>) => {
@@ -232,6 +265,9 @@ const App: React.FC = () => {
           student={selectedStudent}
           onBack={() => setSelectedStudentId(null)}
           onAddLesson={() => setIsNewLessonModalOpen(true)}
+          onEditLesson={handleEditLesson}
+          onDeleteLesson={handleDeleteLesson}
+          onEditStudent={handleEditStudent}
           onToggleOrchestra={handleToggleOrchestra}
           onUpdatePhase={handleUpdateStudentPhase}
         />
@@ -404,7 +440,11 @@ const App: React.FC = () => {
         <NewLessonModal
           methods={methods}
           studentInstrument={selectedStudent?.instrument}
-          onClose={() => setIsNewLessonModalOpen(false)}
+          lessonToEdit={lessonToEdit}
+          onClose={() => {
+            setIsNewLessonModalOpen(false);
+            setLessonToEdit(null);
+          }}
           onSave={handleAddLesson}
         />
       )}
@@ -412,8 +452,12 @@ const App: React.FC = () => {
       {isNewStudentModalOpen && (
         <NewStudentModal
           teachers={teachers}
+          studentToEdit={studentToEdit}
           availableInstruments={instruments.map(i => i.name)}
-          onClose={() => setIsNewStudentModalOpen(false)}
+          onClose={() => {
+            setIsNewStudentModalOpen(false);
+            setStudentToEdit(null);
+          }}
           onSave={handleAddNewStudent}
         />
       )}

@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { Student, Lesson, LearningPhase } from '../types';
-import { Calendar, ChevronLeft, CheckCircle, Clock, BookOpen, Music, Star, Edit3, PlusCircle, FileText, Download } from 'lucide-react';
+import { Calendar, ChevronLeft, CheckCircle, Clock, BookOpen, Music, Star, Edit3, PlusCircle, Download, Trash2, GraduationCap } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -10,6 +9,9 @@ interface StudentProfileProps {
   student: Student;
   onBack: () => void;
   onAddLesson: () => void;
+  onEditLesson: (lesson: Lesson) => void;
+  onDeleteLesson: (id: string) => void;
+  onEditStudent: (student: Student) => void;
   onToggleOrchestra: () => void;
   onUpdatePhase: (phase: LearningPhase) => void;
 }
@@ -18,6 +20,9 @@ const StudentProfile: React.FC<StudentProfileProps> = ({
   student,
   onBack,
   onAddLesson,
+  onEditLesson,
+  onDeleteLesson,
+  onEditStudent,
   onToggleOrchestra,
   onUpdatePhase
 }) => {
@@ -131,6 +136,7 @@ const StudentProfile: React.FC<StudentProfileProps> = ({
 
     doc.save(`Relatorio_${student.name.replace(/\s+/g, '_')}.pdf`);
   };
+
   const chartData = student.lessons
     .filter(l => l.evaluation)
     .map(l => ({
@@ -161,7 +167,15 @@ const StudentProfile: React.FC<StudentProfileProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column: Basic Info & Stats */}
         <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 text-center">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 text-center relative group">
+            <button
+              onClick={() => onEditStudent(student)}
+              className="absolute top-4 right-4 p-2 bg-slate-50 text-slate-400 rounded-full hover:bg-amber-50 hover:text-amber-600 transition-all opacity-0 group-hover:opacity-100"
+              title="Editar Aluno"
+            >
+              <Edit3 className="w-5 h-5" />
+            </button>
+
             <div className="w-24 h-24 rounded-full bg-blue-600 text-white text-3xl font-bold flex items-center justify-center mx-auto mb-4 border-4 border-blue-50">
               {student.name.charAt(0)}
             </div>
@@ -322,7 +336,7 @@ const StudentProfile: React.FC<StudentProfileProps> = ({
             <div className="divide-y divide-slate-100">
               {student.lessons.length > 0 ? (
                 student.lessons.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(lesson => (
-                  <div key={lesson.id} className="p-6 hover:bg-slate-50 transition-colors">
+                  <div key={lesson.id} className="p-6 hover:bg-slate-50 transition-colors group">
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex items-center">
                         <span className="font-bold text-slate-900 mr-3">
@@ -333,6 +347,23 @@ const StudentProfile: React.FC<StudentProfileProps> = ({
                         ) : (
                           <span className="bg-red-100 text-red-700 px-2 py-0.5 rounded text-xs font-bold">FALTOU</span>
                         )}
+                      </div>
+
+                      <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                        <button
+                          onClick={() => onEditLesson(lesson)}
+                          className="p-1.5 text-slate-400 hover:text-amber-500 hover:bg-amber-50 rounded-lg transition-colors"
+                          title="Editar Aula"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => onDeleteLesson(lesson.id)}
+                          className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Excluir Aula"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
 
@@ -368,13 +399,5 @@ const StudentProfile: React.FC<StudentProfileProps> = ({
     </div>
   );
 };
-
-const GraduationCap = ({ className }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l9-5-9-5-9 5 9 5z" />
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
-  </svg>
-);
 
 export default StudentProfile;

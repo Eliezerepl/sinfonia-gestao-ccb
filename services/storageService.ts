@@ -208,5 +208,46 @@ export const storageService = {
 
     if (error) throw error;
     return data;
+  },
+
+  updateLesson: async (id: string, lesson: Partial<Lesson>) => {
+    const dbData: any = {};
+    if (lesson.date) dbData.date = lesson.date;
+    if (lesson.present !== undefined) dbData.present = lesson.present;
+    if (lesson.observation !== undefined) dbData.observation = lesson.observation;
+    if (lesson.exercisesMastered) dbData.exercises_mastered = lesson.exercisesMastered;
+    if (lesson.hymnsMastered) dbData.hymns_mastered = lesson.hymnsMastered;
+    if (lesson.evaluation !== undefined) dbData.evaluation = lesson.evaluation;
+
+    const { error } = await supabase
+      .from('lessons')
+      .update(dbData)
+      .eq('id', id);
+    if (error) throw error;
+  },
+
+  deleteLesson: async (id: string) => {
+    const { error } = await supabase
+      .from('lessons')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+  },
+
+  updateStudent: async (id: string, student: Partial<Student>) => {
+    const dbData: any = {};
+    if (student.name) dbData.name = student.name;
+    if (student.instrument) dbData.instrument = student.instrument;
+    if (student.phase) dbData.phase = student.phase;
+    if (student.teacherId) dbData.teacher_id = student.teacherId;
+    if (student.active !== undefined) dbData.active = student.active;
+    if (student.enrollmentDate) dbData.enrollment_date = student.enrollmentDate;
+    if (student.isOrchestraReady !== undefined) dbData.is_orchestra_ready = student.isOrchestraReady;
+
+    const { error } = await supabase
+      .from('students')
+      .update(dbData)
+      .eq('id', id);
+    if (error) throw error;
   }
 };

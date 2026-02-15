@@ -1,15 +1,16 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Lesson, MethodEntity } from '../types';
 import { X, CheckCircle, Save, Book } from 'lucide-react';
 
 interface NewLessonModalProps {
   methods: MethodEntity[];
   studentInstrument?: string;
+  lessonToEdit?: Lesson | null;
   onClose: () => void;
   onSave: (lesson: Partial<Lesson>) => void;
 }
 
-const NewLessonModal: React.FC<NewLessonModalProps> = ({ methods, studentInstrument, onClose, onSave }) => {
+const NewLessonModal: React.FC<NewLessonModalProps> = ({ methods, studentInstrument, lessonToEdit, onClose, onSave }) => {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [present, setPresent] = useState(true);
   const [observation, setObservation] = useState('');
@@ -38,6 +39,62 @@ const NewLessonModal: React.FC<NewLessonModalProps> = ({ methods, studentInstrum
   const [tech, setTech] = useState(7);
   const [rhythm, setRhythm] = useState(7);
   const [reading, setReading] = useState(7);
+
+  useEffect(() => {
+    if (lessonToEdit) {
+      setDate(lessonToEdit.date);
+      setPresent(lessonToEdit.present);
+      setObservation(lessonToEdit.observation || '');
+      setHymns(lessonToEdit.hymnsMastered?.join(', ') || '');
+
+      if (lessonToEdit.evaluation) {
+        setTech(lessonToEdit.evaluation.technique);
+        setRhythm(lessonToEdit.evaluation.rhythm);
+        setReading(lessonToEdit.evaluation.reading);
+      }
+
+      // Parse exercisesMastered
+      // Format is usually "MethodName Fase X Lição Y Ex Z"
+      if (lessonToEdit.exercisesMastered && lessonToEdit.exercisesMastered.length > 0) {
+        const parseMethod = (str: string) => {
+          // This is a simple parser, might need more robust logic if format varies
+          const parts = str.split(' ');
+          let methodName = "";
+          let phase = "";
+          let lesson = "";
+          let exercise = "";
+
+          // Find where "Fase", "Lição", "Ex" start
+          const faseIdx = parts.indexOf("Fase");
+          const licaoIdx = parts.indexOf("Lição");
+          const exIdx = parts.indexOf("Ex");
+
+          const nameEnd = faseIdx !== -1 ? faseIdx : (licaoIdx !== -1 ? licaoIdx : (exIdx !== -1 ? exIdx : parts.length));
+          methodName = parts.slice(0, nameEnd).join(' ').trim();
+
+          if (faseIdx !== -1) phase = parts[faseIdx + 1];
+          if (licaoIdx !== -1) lesson = parts[licaoIdx + 1];
+          if (exIdx !== -1) exercise = parts[exIdx + 1];
+
+          return { methodName, phase, lesson, exercise };
+        };
+
+        const m1 = parseMethod(lessonToEdit.exercisesMastered[0]);
+        setSelectedMethod1(m1.methodName);
+        setPhase1(m1.phase);
+        setLesson1(m1.lesson);
+        setExercise1(m1.exercise);
+
+        if (lessonToEdit.exercisesMastered[1]) {
+          const m2 = parseMethod(lessonToEdit.exercisesMastered[1]);
+          setSelectedMethod2(m2.methodName);
+          setPhase2(m2.phase);
+          setLesson2(m2.lesson);
+          setExercise2(m2.exercise);
+        }
+      }
+    }
+  }, [lessonToEdit]);
 
   const handleSave = () => {
     const mastered = [];
@@ -78,9 +135,9 @@ const NewLessonModal: React.FC<NewLessonModalProps> = ({ methods, studentInstrum
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
       <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-        <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-blue-600 text-white">
-          <h3 className="text-xl font-bold">Registrar Aula</h3>
-          <button onClick={onClose} className="hover:bg-blue-700 p-1 rounded-full transition-colors">
+        <div className={`p-6 border-b border-slate-100 flex justify-between items-center ${lessonToEdit ? 'bg-amber-500' : 'bg-blue-600'} text-white`}>
+          <h3 className="text-xl font-bold">{lessonToEdit ? 'Editar Registro de Aula' : 'Registrar Aula'}</h3>
+          <button onClick={onClose} className="hover:opacity-80 p-1 rounded-full transition-colors">
             <X className="w-6 h-6" />
           </button>
         </div>
@@ -288,9 +345,9 @@ const NewLessonModal: React.FC<NewLessonModalProps> = ({ methods, studentInstrum
           </button>
           <button
             onClick={handleSave}
-            className="flex-1 py-3 px-4 rounded-xl font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-all flex items-center justify-center shadow-lg shadow-blue-200 active:scale-95"
+            className={`flex-1 py-3 px-4 rounded-xl font-semibold text-white transition-all flex items-center justify-center shadow-lg active:scale-95 ${lessonToEdit ? 'bg-amber-500 hover:bg-amber-600 shadow-amber-100' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-200'}`}
           >
-            <Save className="w-5 h-5 mr-2" /> Salvar Aula
+            {lessonToEdit ? <><Save className="w-5 h-5 mr-2" /> Atualizar Registro</> : <><Save className="w-5 h-5 mr-2" /> Salvar Aula</>}
           </button>
         </div>
       </div>
