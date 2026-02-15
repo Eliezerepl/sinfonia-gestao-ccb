@@ -41,7 +41,9 @@ export const storageService = {
     return (data || []).map((m: any) => ({
       ...m,
       totalLessons: m.total_lessons,
-      totalExercises: m.total_exercises
+      totalExercises: m.total_exercises,
+      hasPhases: m.has_phases,
+      totalPhases: m.total_phases
     }));
   },
 
@@ -50,7 +52,9 @@ export const storageService = {
       name: method.name,
       description: method.description,
       total_lessons: method.totalLessons,
-      total_exercises: method.totalExercises
+      total_exercises: method.totalExercises,
+      has_phases: method.hasPhases,
+      total_phases: method.totalPhases
     };
     const { data, error } = await supabase
       .from('methods')

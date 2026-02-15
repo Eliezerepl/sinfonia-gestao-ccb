@@ -19,6 +19,8 @@ export interface MethodEntity {
   description?: string;
   totalLessons?: number;
   totalExercises?: number;
+  hasPhases?: boolean;
+  totalPhases?: number;
 }
 
 export enum LearningPhase {

@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { MethodEntity } from '../types';
-import { Plus, Trash2, Book, Edit3 } from 'lucide-react';
+import { Plus, Trash2, Book, Edit3, Star } from 'lucide-react';
 
 interface MethodsManagementViewProps {
   methods: MethodEntity[];
@@ -14,6 +14,8 @@ const MethodsManagementView: React.FC<MethodsManagementViewProps> = ({ methods, 
   const [description, setDescription] = useState('');
   const [totalLessons, setTotalLessons] = useState<string>('');
   const [totalExercises, setTotalExercises] = useState<string>('');
+  const [hasPhases, setHasPhases] = useState(false);
+  const [totalPhases, setTotalPhases] = useState<string>('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,12 +24,16 @@ const MethodsManagementView: React.FC<MethodsManagementViewProps> = ({ methods, 
       name: name.trim(),
       description: description.trim(),
       totalLessons: parseInt(totalLessons) || 0,
-      totalExercises: parseInt(totalExercises) || 0
+      totalExercises: parseInt(totalExercises) || 0,
+      hasPhases,
+      totalPhases: hasPhases ? (parseInt(totalPhases) || 0) : 0
     });
     setName('');
     setDescription('');
     setTotalLessons('');
     setTotalExercises('');
+    setHasPhases(false);
+    setTotalPhases('');
   };
 
   return (
@@ -80,6 +86,35 @@ const MethodsManagementView: React.FC<MethodsManagementViewProps> = ({ methods, 
               </div>
             </div>
 
+            <div className="pt-2">
+              <label className="flex items-center space-x-3 cursor-pointer group">
+                <div className={`w-10 h-6 flex items-center bg-slate-200 rounded-full p-1 duration-300 ease-in-out ${hasPhases ? 'bg-blue-600' : ''}`}>
+                  <div className={`bg-white w-4 h-4 rounded-full shadow-md transform duration-300 ease-in-out ${hasPhases ? 'translate-x-4' : ''}`}></div>
+                </div>
+                <input
+                  type="checkbox"
+                  className="hidden"
+                  checked={hasPhases}
+                  onChange={(e) => setHasPhases(e.target.checked)}
+                />
+                <span className="text-sm font-semibold text-slate-700 group-hover:text-blue-600 transition-colors">Possui Fases?</span>
+              </label>
+            </div>
+
+            {hasPhases && (
+              <div className="animate-in slide-in-from-top-2 duration-200">
+                <label className="block text-sm font-semibold text-slate-700 mb-1">Quantidade de Fases</label>
+                <input
+                  type="number"
+                  value={totalPhases}
+                  onChange={e => setTotalPhases(e.target.value)}
+                  placeholder="Ex: 4"
+                  className="w-full border border-slate-200 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                  required
+                />
+              </div>
+            )}
+
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1">Descrição (opcional)</label>
               <textarea
@@ -115,7 +150,7 @@ const MethodsManagementView: React.FC<MethodsManagementViewProps> = ({ methods, 
                     </div>
                     <div>
                       <p className="font-bold text-slate-800">{method.name}</p>
-                      <div className="flex items-center gap-4 mt-1">
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1">
                         <div className="flex items-center text-[10px] text-slate-500 font-medium">
                           <Book className="w-3 h-3 mr-1 text-slate-400" />
                           <span>{method.totalLessons || 0} Lições</span>
@@ -124,6 +159,12 @@ const MethodsManagementView: React.FC<MethodsManagementViewProps> = ({ methods, 
                           <Edit3 className="w-3 h-3 mr-1 text-slate-400" />
                           <span>{method.totalExercises || 0} Exercícios</span>
                         </div>
+                        {method.hasPhases && (
+                          <div className="flex items-center text-[10px] text-blue-600 font-bold bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100">
+                            <Star className="w-3 h-3 mr-1" />
+                            <span>{method.totalPhases || 0} Fases</span>
+                          </div>
+                        )}
                       </div>
                       {method.description && <p className="text-[11px] text-slate-400 mt-1">{method.description}</p>}
                     </div>
