@@ -16,11 +16,15 @@ const NewLessonModal: React.FC<NewLessonModalProps> = ({ methods, onClose, onSav
 
   // Method 1
   const [selectedMethod1, setSelectedMethod1] = useState('');
-  const [exerciseNum1, setExerciseNum1] = useState('');
+  const [phase1, setPhase1] = useState('');
+  const [lesson1, setLesson1] = useState('');
+  const [exercise1, setExercise1] = useState('');
 
   // Method 2
   const [selectedMethod2, setSelectedMethod2] = useState('');
-  const [exerciseNum2, setExerciseNum2] = useState('');
+  const [phase2, setPhase2] = useState('');
+  const [lesson2, setLesson2] = useState('');
+  const [exercise2, setExercise2] = useState('');
 
   const [hymns, setHymns] = useState('');
   const [tech, setTech] = useState(7);
@@ -29,11 +33,23 @@ const NewLessonModal: React.FC<NewLessonModalProps> = ({ methods, onClose, onSav
 
   const handleSave = () => {
     const mastered = [];
-    if (selectedMethod1 && exerciseNum1) {
-      mastered.push(`${selectedMethod1} ${exerciseNum1}`);
+
+    // Format Method 1
+    if (selectedMethod1) {
+      let m1Str = selectedMethod1;
+      if (phase1) m1Str += ` Fase ${phase1}`;
+      if (lesson1) m1Str += ` Lição ${lesson1}`;
+      if (exercise1) m1Str += ` Ex ${exercise1}`;
+      if (phase1 || lesson1 || exercise1) mastered.push(m1Str);
     }
-    if (selectedMethod2 && exerciseNum2) {
-      mastered.push(`${selectedMethod2} ${exerciseNum2}`);
+
+    // Format Method 2
+    if (selectedMethod2) {
+      let m2Str = selectedMethod2;
+      if (phase2) m2Str += ` Fase ${phase2}`;
+      if (lesson2) m2Str += ` Lição ${lesson2}`;
+      if (exercise2) m2Str += ` Ex ${exercise2}`;
+      if (phase2 || lesson2 || exercise2) mastered.push(m2Str);
     }
 
     onSave({
@@ -103,13 +119,13 @@ const NewLessonModal: React.FC<NewLessonModalProps> = ({ methods, onClose, onSav
                 </label>
 
                 {/* Method Row 1 */}
-                <div>
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="col-span-2">
+                <div className="space-y-2 border-b border-slate-200/50 pb-4 last:border-0 last:pb-0">
+                  <div className="flex gap-2">
+                    <div className="flex-1 min-w-0">
                       <select
                         value={selectedMethod1}
                         onChange={e => setSelectedMethod1(e.target.value)}
-                        className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white transition-all overflow-hidden text-ellipsis"
+                        className="w-full border border-slate-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white transition-all overflow-hidden text-ellipsis font-semibold"
                       >
                         <option value="">Selecione o Método 1</option>
                         {methods.map(m => (
@@ -117,45 +133,54 @@ const NewLessonModal: React.FC<NewLessonModalProps> = ({ methods, onClose, onSav
                         ))}
                       </select>
                     </div>
-                    <div className="col-span-1">
-                      <input
-                        type="number"
-                        value={exerciseNum1}
-                        onChange={e => setExerciseNum1(e.target.value)}
-                        placeholder="Lição"
-                        className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white"
-                      />
-                    </div>
                   </div>
+
                   {selectedMethod1 && (
-                    <div className="flex flex-wrap gap-2 mt-1.5 px-1">
-                      {methods.find(m => m.name === selectedMethod1)?.totalLessons ? (
-                        <span className="text-[9px] text-slate-500 bg-white border border-slate-200 px-1.5 py-0.5 rounded shadow-sm">
-                          Total: {methods.find(m => m.name === selectedMethod1)?.totalLessons} Lições
-                        </span>
-                      ) : null}
-                      {methods.find(m => m.name === selectedMethod1)?.totalExercises ? (
-                        <span className="text-[9px] text-slate-500 bg-white border border-slate-200 px-1.5 py-0.5 rounded shadow-sm">
-                          {methods.find(m => m.name === selectedMethod1)?.totalExercises} Exercícios
-                        </span>
-                      ) : null}
-                      {methods.find(m => m.name === selectedMethod1)?.hasPhases ? (
-                        <span className="text-[9px] text-blue-600 bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded font-bold shadow-sm">
-                          {methods.find(m => m.name === selectedMethod1)?.totalPhases} Fases
-                        </span>
-                      ) : null}
+                    <div className="grid grid-cols-3 gap-2 animate-in fade-in slide-in-from-top-1 duration-200">
+                      {methods.find(m => m.name === selectedMethod1)?.hasPhases && (
+                        <div>
+                          <label className="text-[10px] text-slate-500 block mb-1 font-bold uppercase">Fase</label>
+                          <input
+                            type="number"
+                            value={phase1}
+                            onChange={e => setPhase1(e.target.value)}
+                            placeholder={`Max ${methods.find(m => m.name === selectedMethod1)?.totalPhases || '?'}`}
+                            className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium"
+                          />
+                        </div>
+                      )}
+                      <div>
+                        <label className="text-[10px] text-slate-500 block mb-1 font-bold uppercase">Lição</label>
+                        <input
+                          type="number"
+                          value={lesson1}
+                          onChange={e => setLesson1(e.target.value)}
+                          placeholder={`Max ${methods.find(m => m.name === selectedMethod1)?.totalLessons || '?'}`}
+                          className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-slate-500 block mb-1 font-bold uppercase">Exercício</label>
+                        <input
+                          type="number"
+                          value={exercise1}
+                          onChange={e => setExercise1(e.target.value)}
+                          placeholder={`Max ${methods.find(m => m.name === selectedMethod1)?.totalExercises || '?'}`}
+                          className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium"
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
 
                 {/* Method Row 2 */}
-                <div>
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="col-span-2">
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <div className="flex-1 min-w-0">
                       <select
                         value={selectedMethod2}
                         onChange={e => setSelectedMethod2(e.target.value)}
-                        className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white transition-all overflow-hidden text-ellipsis"
+                        className="w-full border border-slate-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white transition-all overflow-hidden text-ellipsis font-semibold"
                       >
                         <option value="">Selecione o Método 2</option>
                         {methods.map(m => (
@@ -163,33 +188,42 @@ const NewLessonModal: React.FC<NewLessonModalProps> = ({ methods, onClose, onSav
                         ))}
                       </select>
                     </div>
-                    <div className="col-span-1">
-                      <input
-                        type="number"
-                        value={exerciseNum2}
-                        onChange={e => setExerciseNum2(e.target.value)}
-                        placeholder="Lição"
-                        className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white"
-                      />
-                    </div>
                   </div>
+
                   {selectedMethod2 && (
-                    <div className="flex flex-wrap gap-2 mt-1.5 px-1">
-                      {methods.find(m => m.name === selectedMethod2)?.totalLessons ? (
-                        <span className="text-[9px] text-slate-500 bg-white border border-slate-200 px-1.5 py-0.5 rounded shadow-sm">
-                          Total: {methods.find(m => m.name === selectedMethod2)?.totalLessons} Lições
-                        </span>
-                      ) : null}
-                      {methods.find(m => m.name === selectedMethod2)?.totalExercises ? (
-                        <span className="text-[9px] text-slate-500 bg-white border border-slate-200 px-1.5 py-0.5 rounded shadow-sm">
-                          {methods.find(m => m.name === selectedMethod2)?.totalExercises} Exercícios
-                        </span>
-                      ) : null}
-                      {methods.find(m => m.name === selectedMethod2)?.hasPhases ? (
-                        <span className="text-[9px] text-blue-600 bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded font-bold shadow-sm">
-                          {methods.find(m => m.name === selectedMethod2)?.totalPhases} Fases
-                        </span>
-                      ) : null}
+                    <div className="grid grid-cols-3 gap-2 animate-in fade-in slide-in-from-top-1 duration-200">
+                      {methods.find(m => m.name === selectedMethod2)?.hasPhases && (
+                        <div>
+                          <label className="text-[10px] text-slate-500 block mb-1 font-bold uppercase">Fase</label>
+                          <input
+                            type="number"
+                            value={phase2}
+                            onChange={e => setPhase2(e.target.value)}
+                            placeholder={`Max ${methods.find(m => m.name === selectedMethod2)?.totalPhases || '?'}`}
+                            className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium"
+                          />
+                        </div>
+                      )}
+                      <div>
+                        <label className="text-[10px] text-slate-500 block mb-1 font-bold uppercase">Lição</label>
+                        <input
+                          type="number"
+                          value={lesson2}
+                          onChange={e => setLesson2(e.target.value)}
+                          placeholder={`Max ${methods.find(m => m.name === selectedMethod2)?.totalLessons || '?'}`}
+                          className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-slate-500 block mb-1 font-bold uppercase">Exercício</label>
+                        <input
+                          type="number"
+                          value={exercise2}
+                          onChange={e => setExercise2(e.target.value)}
+                          placeholder={`Max ${methods.find(m => m.name === selectedMethod2)?.totalExercises || '?'}`}
+                          className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium"
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
