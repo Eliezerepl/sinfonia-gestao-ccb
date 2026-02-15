@@ -9,9 +9,16 @@ interface StudentProfileProps {
   onBack: () => void;
   onAddLesson: () => void;
   onToggleOrchestra: () => void;
+  onUpdatePhase: (phase: LearningPhase) => void;
 }
 
-const StudentProfile: React.FC<StudentProfileProps> = ({ student, onBack, onAddLesson, onToggleOrchestra }) => {
+const StudentProfile: React.FC<StudentProfileProps> = ({
+  student,
+  onBack,
+  onAddLesson,
+  onToggleOrchestra,
+  onUpdatePhase
+}) => {
   const chartData = student.lessons
     .filter(l => l.evaluation)
     .map(l => ({
@@ -23,7 +30,7 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, onBack, onAddL
 
   return (
     <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-      <button 
+      <button
         onClick={onBack}
         className="flex items-center text-blue-600 hover:text-blue-800 font-medium mb-6 transition-colors"
       >
@@ -41,12 +48,29 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, onBack, onAddL
             <p className="text-blue-600 font-medium mb-6 flex items-center justify-center">
               <Music className="w-4 h-4 mr-2" /> {student.instrument}
             </p>
-            
+
             <div className="flex flex-col gap-3">
-              <div className="bg-slate-50 p-4 rounded-xl text-left">
-                <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Fase Atual</p>
-                <p className="font-semibold text-slate-800">{student.phase}</p>
+              <div className="bg-slate-50 p-4 rounded-xl text-left border border-slate-100 focus-within:ring-2 focus-within:ring-blue-500 transition-all">
+                <label className="text-xs text-slate-500 uppercase tracking-wider mb-1 block">Fase Atual</label>
+                <div className="relative group">
+                  <GraduationCap className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-500" />
+                  <select
+                    value={student.phase}
+                    onChange={(e) => onUpdatePhase(e.target.value as LearningPhase)}
+                    className="w-full bg-transparent font-semibold text-slate-800 outline-none pl-6 appearance-none cursor-pointer"
+                  >
+                    {Object.values(LearningPhase).map(ph => (
+                      <option key={ph} value={ph}>{ph}</option>
+                    ))}
+                  </select>
+                  <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
+
               <div className="bg-slate-50 p-4 rounded-xl text-left">
                 <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Data de Início</p>
                 <div className="flex items-center font-semibold text-slate-800">
@@ -56,13 +80,12 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, onBack, onAddL
               </div>
             </div>
 
-            <button 
+            <button
               onClick={onToggleOrchestra}
-              className={`w-full mt-6 py-3 px-4 rounded-xl font-semibold flex items-center justify-center transition-all ${
-                student.isOrchestraReady 
-                ? 'bg-amber-100 text-amber-700 border-2 border-amber-200 hover:bg-amber-200' 
-                : 'bg-slate-100 text-slate-600 border-2 border-slate-200 hover:bg-slate-200'
-              }`}
+              className={`w-full mt-6 py-3 px-4 rounded-xl font-semibold flex items-center justify-center transition-all ${student.isOrchestraReady
+                  ? 'bg-amber-100 text-amber-700 border-2 border-amber-200 hover:bg-amber-200'
+                  : 'bg-slate-100 text-slate-600 border-2 border-slate-200 hover:bg-slate-200'
+                }`}
             >
               <Star className={`w-5 h-5 mr-2 ${student.isOrchestraReady ? 'fill-current' : ''}`} />
               {student.isOrchestraReady ? 'Apto para Orquestra' : 'Marcar como Apto'}
@@ -106,13 +129,13 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, onBack, onAddL
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                    <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
-                    <YAxis domain={[0, 10]} axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
-                    <Tooltip contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
+                    <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                    <YAxis domain={[0, 10]} axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                    <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
                     <Legend iconType="circle" />
-                    <Line type="monotone" dataKey="técnica" stroke="#3b82f6" strokeWidth={3} dot={{r: 4}} />
-                    <Line type="monotone" dataKey="ritmo" stroke="#10b981" strokeWidth={3} dot={{r: 4}} />
-                    <Line type="monotone" dataKey="leitura" stroke="#f59e0b" strokeWidth={3} dot={{r: 4}} />
+                    <Line type="monotone" dataKey="técnica" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4 }} />
+                    <Line type="monotone" dataKey="ritmo" stroke="#10b981" strokeWidth={3} dot={{ r: 4 }} />
+                    <Line type="monotone" dataKey="leitura" stroke="#f59e0b" strokeWidth={3} dot={{ r: 4 }} />
                   </LineChart>
                 </ResponsiveContainer>
               ) : (
@@ -129,7 +152,7 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, onBack, onAddL
               <h3 className="font-bold text-slate-900 flex items-center">
                 <Edit3 className="w-5 h-5 mr-2 text-blue-500" /> Histórico de Aulas
               </h3>
-              <button 
+              <button
                 onClick={onAddLesson}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center transition-colors"
               >
@@ -138,7 +161,7 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, onBack, onAddL
             </div>
             <div className="divide-y divide-slate-100">
               {student.lessons.length > 0 ? (
-                student.lessons.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(lesson => (
+                student.lessons.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(lesson => (
                   <div key={lesson.id} className="p-6 hover:bg-slate-50 transition-colors">
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex items-center">
@@ -152,7 +175,7 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, onBack, onAddL
                         )}
                       </div>
                     </div>
-                    
+
                     {lesson.present && (
                       <>
                         <p className="text-slate-600 text-sm mb-3 italic">"{lesson.observation}"</p>
@@ -185,5 +208,13 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, onBack, onAddL
     </div>
   );
 };
+
+const GraduationCap = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l9-5-9-5-9 5 9 5z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+  </svg>
+);
 
 export default StudentProfile;

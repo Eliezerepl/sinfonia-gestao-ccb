@@ -103,6 +103,18 @@ const App: React.FC = () => {
     }
   };
 
+  const handleUpdateStudentPhase = async (phase: LearningPhase) => {
+    if (!selectedStudentId) return;
+    try {
+      await storageService.updateStudentPhase(selectedStudentId, phase);
+      setStudents(prev => prev.map(s =>
+        s.id === selectedStudentId ? { ...s, phase } : s
+      ));
+    } catch (error) {
+      alert('Erro ao atualizar fase');
+    }
+  };
+
   const handleAddNewStudent = async (studentData: any) => {
     try {
       await storageService.saveStudent(studentData);
@@ -184,8 +196,8 @@ const App: React.FC = () => {
       <button
         onClick={() => navigateTo(view)}
         className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive
-            ? 'bg-blue-600 text-white shadow-lg shadow-blue-200 font-semibold'
-            : 'text-slate-500 hover:bg-slate-50 hover:text-blue-600 group'
+          ? 'bg-blue-600 text-white shadow-lg shadow-blue-200 font-semibold'
+          : 'text-slate-500 hover:bg-slate-50 hover:text-blue-600 group'
           }`}
       >
         <span className={`${isActive ? 'text-white' : 'text-slate-400 group-hover:text-blue-500'}`}>
@@ -212,6 +224,7 @@ const App: React.FC = () => {
           onBack={() => setSelectedStudentId(null)}
           onAddLesson={() => setIsNewLessonModalOpen(true)}
           onToggleOrchestra={handleToggleOrchestra}
+          onUpdatePhase={handleUpdateStudentPhase}
         />
       );
     }

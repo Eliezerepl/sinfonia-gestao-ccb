@@ -142,6 +142,14 @@ export const storageService = {
     if (error) throw error;
   },
 
+  updateStudentPhase: async (id: string, phase: string) => {
+    const { error } = await supabase
+      .from('students')
+      .update({ phase })
+      .eq('id', id);
+    if (error) throw error;
+  },
+
   // Lessons
   addLesson: async (studentId: string, lesson: Omit<Lesson, 'id'>) => {
     const dbData = {
