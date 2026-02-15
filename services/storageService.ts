@@ -38,13 +38,23 @@ export const storageService = {
       .select('*')
       .order('name');
     if (error) throw error;
-    return data || [];
+    return (data || []).map((m: any) => ({
+      ...m,
+      totalLessons: m.total_lessons,
+      totalExercises: m.total_exercises
+    }));
   },
 
   saveMethod: async (method: Omit<MethodEntity, 'id'>) => {
+    const dbData = {
+      name: method.name,
+      description: method.description,
+      total_lessons: method.totalLessons,
+      total_exercises: method.totalExercises
+    };
     const { data, error } = await supabase
       .from('methods')
-      .insert([method])
+      .insert([dbData])
       .select()
       .single();
     if (error) throw error;

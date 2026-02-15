@@ -17,6 +17,8 @@ export interface MethodEntity {
   id: string;
   name: string;
   description?: string;
+  totalLessons?: number;
+  totalExercises?: number;
 }
 
 export enum LearningPhase {
