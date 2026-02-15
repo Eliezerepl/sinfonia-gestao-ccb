@@ -1,48 +1,148 @@
 
-import { Student, Teacher, InstrumentEntity, MethodEntity } from '../types';
-import { INITIAL_STUDENTS, INITIAL_TEACHERS, INITIAL_INSTRUMENTS, INITIAL_METHODS } from '../constants';
-
-const STORAGE_KEYS = {
-  STUDENTS: 'sinfonia_students',
-  TEACHERS: 'sinfonia_teachers',
-  INSTRUMENTS: 'sinfonia_instruments',
-  METHODS: 'sinfonia_methods'
-};
+import { supabase } from './supabaseClient';
+import { Student, Teacher, InstrumentEntity, MethodEntity, Lesson } from '../types';
 
 export const storageService = {
-  getStudents: (): Student[] => {
-    const data = localStorage.getItem(STORAGE_KEYS.STUDENTS);
-    return data ? JSON.parse(data) : INITIAL_STUDENTS;
-  },
-  
-  saveStudents: (students: Student[]): void => {
-    localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(students));
-  },
-  
-  getTeachers: (): Teacher[] => {
-    const data = localStorage.getItem(STORAGE_KEYS.TEACHERS);
-    return data ? JSON.parse(data) : INITIAL_TEACHERS;
-  },
-  
-  saveTeachers: (teachers: Teacher[]): void => {
-    localStorage.setItem(STORAGE_KEYS.TEACHERS, JSON.stringify(teachers));
+  // Instruments
+  getInstruments: async (): Promise<InstrumentEntity[]> => {
+    const { data, error } = await supabase
+      .from('instruments')
+      .select('*')
+      .order('name');
+    if (error) throw error;
+    return data || [];
   },
 
-  getInstruments: (): InstrumentEntity[] => {
-    const data = localStorage.getItem(STORAGE_KEYS.INSTRUMENTS);
-    return data ? JSON.parse(data) : INITIAL_INSTRUMENTS;
+  saveInstrument: async (instrument: Omit<InstrumentEntity, 'id'>) => {
+    const { data, error } = await supabase
+      .from('instruments')
+      .insert([instrument])
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
   },
 
-  saveInstruments: (instruments: InstrumentEntity[]): void => {
-    localStorage.setItem(STORAGE_KEYS.INSTRUMENTS, JSON.stringify(instruments));
+  deleteInstrument: async (id: string) => {
+    const { error } = await supabase
+      .from('instruments')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
   },
 
-  getMethods: (): MethodEntity[] => {
-    const data = localStorage.getItem(STORAGE_KEYS.METHODS);
-    return data ? JSON.parse(data) : INITIAL_METHODS;
+  // Methods
+  getMethods: async (): Promise<MethodEntity[]> => {
+    const { data, error } = await supabase
+      .from('methods')
+      .select('*')
+      .order('name');
+    if (error) throw error;
+    return data || [];
   },
 
-  saveMethods: (methods: MethodEntity[]): void => {
-    localStorage.setItem(STORAGE_KEYS.METHODS, JSON.stringify(methods));
+  saveMethod: async (method: Omit<MethodEntity, 'id'>) => {
+    const { data, error } = await supabase
+      .from('methods')
+      .insert([method])
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  deleteMethod: async (id: string) => {
+    const { error } = await supabase
+      .from('methods')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+  },
+
+  // Teachers
+  getTeachers: async (): Promise<Teacher[]> => {
+    const { data, error } = await supabase
+      .from('teachers')
+      .select('*')
+      .order('name');
+    if (error) throw error;
+    return data || [];
+  },
+
+  // Students
+  getStudents: async (): Promise<Student[]> => {
+    const { data, error } = await supabase
+      .from('students')
+      .select(`
+        *,
+        lessons (*)
+      `)
+      .order('name');
+
+    if (error) throw error;
+
+    // Map Snake Case to Camel Case if necessary, though Supabase might return what we need
+    return (data || []).map((s: any) => ({
+      ...s,
+      teacherId: s.teacher_id,
+      enrollmentDate: s.enrollment_date,
+      isOrchestraReady: s.is_orchestra_ready,
+      lessons: (s.lessons || []).map((l: any) => ({
+        ...l,
+        exercisesMastered: l.exercises_mastered,
+        hymnsMastered: l.hymns_mastered
+      }))
+    }));
+  },
+
+  saveStudent: async (student: Omit<Student, 'id' | 'lessons'>) => {
+    const dbData = {
+      name: student.name,
+      instrument: student.instrument,
+      phase: student.phase,
+      teacher_id: student.teacherId,
+      active: student.active,
+      enrollment_date: student.enrollmentDate,
+      is_orchestra_ready: student.isOrchestraReady
+    };
+
+    const { data, error } = await supabase
+      .from('students')
+      .insert([dbData])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  updateStudentOrchestraStatus: async (id: string, isReady: boolean) => {
+    const { error } = await supabase
+      .from('students')
+      .update({ is_orchestra_ready: isReady })
+      .eq('id', id);
+    if (error) throw error;
+  },
+
+  // Lessons
+  addLesson: async (studentId: string, lesson: Omit<Lesson, 'id'>) => {
+    const dbData = {
+      student_id: studentId,
+      date: lesson.date,
+      present: lesson.present,
+      observation: lesson.observation,
+      exercises_mastered: lesson.exercisesMastered,
+      hymns_mastered: lesson.hymnsMastered,
+      evaluation: lesson.evaluation
+    };
+
+    const { data, error } = await supabase
+      .from('lessons')
+      .insert([dbData])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
   }
 };

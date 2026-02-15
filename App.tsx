@@ -2,12 +2,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Student, Teacher, InstrumentEntity, MethodEntity, LearningPhase } from './types';
 import { storageService } from './services/storageService';
-import { 
-  Users, 
-  UserCheck, 
-  Music, 
-  Star, 
-  Plus, 
+import {
+  Users,
+  UserCheck,
+  Music,
+  Star,
+  Plus,
   LayoutDashboard,
   BookOpen,
   Library,
@@ -35,32 +35,37 @@ const App: React.FC = () => {
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [isNewLessonModalOpen, setIsNewLessonModalOpen] = useState(false);
   const [isNewStudentModalOpen, setIsNewStudentModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Load initial data
+  const loadData = async () => {
+    setIsLoading(true);
+    try {
+      const [s, t, i, m] = await Promise.all([
+        storageService.getStudents(),
+        storageService.getTeachers(),
+        storageService.getInstruments(),
+        storageService.getMethods()
+      ]);
+      setStudents(s);
+      setTeachers(t);
+      setInstruments(i);
+      setMethods(m);
+    } catch (error) {
+      console.error('Failed to load data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    setStudents(storageService.getStudents());
-    setTeachers(storageService.getTeachers());
-    setInstruments(storageService.getInstruments());
-    setMethods(storageService.getMethods());
+    loadData();
   }, []);
-
-  // Save data on changes
-  useEffect(() => {
-    if (students.length > 0) storageService.saveStudents(students);
-  }, [students]);
-
-  useEffect(() => {
-    if (instruments.length > 0) storageService.saveInstruments(instruments);
-  }, [instruments]);
-
-  useEffect(() => {
-    if (methods.length > 0) storageService.saveMethods(methods);
-  }, [methods]);
 
   const stats = useMemo(() => {
     const active = students.filter(s => s.active).length;
     const ready = students.filter(s => s.isOrchestraReady).length;
-    
+
     return {
       total: students.length,
       active,
@@ -72,68 +77,78 @@ const App: React.FC = () => {
     return students.find(s => s.id === selectedStudentId);
   }, [students, selectedStudentId]);
 
-  const handleAddLesson = (lessonData: any) => {
+  const handleAddLesson = async (lessonData: any) => {
     if (!selectedStudentId) return;
 
-    setStudents(prev => prev.map(s => {
-      if (s.id === selectedStudentId) {
-        return {
-          ...s,
-          lessons: [
-            ...s.lessons,
-            { ...lessonData, id: Math.random().toString(36).substr(2, 9) }
-          ]
-        };
-      }
-      return s;
-    }));
-    setIsNewLessonModalOpen(false);
-  };
-
-  const handleToggleOrchestra = () => {
-    if (!selectedStudentId) return;
-    setStudents(prev => prev.map(s => {
-      if (s.id === selectedStudentId) {
-        return { ...s, isOrchestraReady: !s.isOrchestraReady };
-      }
-      return s;
-    }));
-  };
-
-  const handleAddNewStudent = (studentData: any) => {
-    const newStudent: Student = {
-      ...studentData,
-      id: Math.random().toString(36).substr(2, 9),
-    };
-    setStudents(prev => [...prev, newStudent]);
-    setIsNewStudentModalOpen(false);
-  };
-
-  const handleAddInstrument = (inst: Omit<InstrumentEntity, 'id'>) => {
-    const newInst: InstrumentEntity = {
-      ...inst,
-      id: Math.random().toString(36).substr(2, 9)
-    };
-    setInstruments(prev => [...prev, newInst]);
-  };
-
-  const handleDeleteInstrument = (id: string) => {
-    if (window.confirm('Deseja realmente excluir este instrumento?')) {
-      setInstruments(prev => prev.filter(i => i.id !== id));
+    try {
+      await storageService.addLesson(selectedStudentId, lessonData);
+      await loadData(); // Refresh data
+      setIsNewLessonModalOpen(false);
+    } catch (error) {
+      alert('Erro ao salvar lição');
     }
   };
 
-  const handleAddMethod = (m: Omit<MethodEntity, 'id'>) => {
-    const newMethod: MethodEntity = {
-      ...m,
-      id: Math.random().toString(36).substr(2, 9)
-    };
-    setMethods(prev => [...prev, newMethod]);
+  const handleToggleOrchestra = async () => {
+    if (!selectedStudentId || !selectedStudent) return;
+    try {
+      const newStatus = !selectedStudent.isOrchestraReady;
+      await storageService.updateStudentOrchestraStatus(selectedStudentId, newStatus);
+      setStudents(prev => prev.map(s =>
+        s.id === selectedStudentId ? { ...s, isOrchestraReady: newStatus } : s
+      ));
+    } catch (error) {
+      alert('Erro ao atualizar status');
+    }
   };
 
-  const handleDeleteMethod = (id: string) => {
+  const handleAddNewStudent = async (studentData: any) => {
+    try {
+      await storageService.saveStudent(studentData);
+      await loadData();
+      setIsNewStudentModalOpen(false);
+    } catch (error) {
+      alert('Erro ao salvar aluno');
+    }
+  };
+
+  const handleAddInstrument = async (inst: Omit<InstrumentEntity, 'id'>) => {
+    try {
+      await storageService.saveInstrument(inst);
+      await loadData();
+    } catch (error) {
+      alert('Erro ao salvar instrumento');
+    }
+  };
+
+  const handleDeleteInstrument = async (id: string) => {
+    if (window.confirm('Deseja realmente excluir este instrumento?')) {
+      try {
+        await storageService.deleteInstrument(id);
+        await loadData();
+      } catch (error) {
+        alert('Erro ao excluir instrumento');
+      }
+    }
+  };
+
+  const handleAddMethod = async (m: Omit<MethodEntity, 'id'>) => {
+    try {
+      await storageService.saveMethod(m);
+      await loadData();
+    } catch (error) {
+      alert('Erro ao salvar método');
+    }
+  };
+
+  const handleDeleteMethod = async (id: string) => {
     if (window.confirm('Deseja realmente excluir este método?')) {
-      setMethods(prev => prev.filter(m => m.id !== id));
+      try {
+        await storageService.deleteMethod(id);
+        await loadData();
+      } catch (error) {
+        alert('Erro ao excluir método');
+      }
     }
   };
 
@@ -145,8 +160,8 @@ const App: React.FC = () => {
   const renderContent = () => {
     if (selectedStudent) {
       return (
-        <StudentProfile 
-          student={selectedStudent} 
+        <StudentProfile
+          student={selectedStudent}
           onBack={() => setSelectedStudentId(null)}
           onAddLesson={() => setIsNewLessonModalOpen(true)}
           onToggleOrchestra={handleToggleOrchestra}
@@ -160,13 +175,13 @@ const App: React.FC = () => {
       case 'hymns':
         return <HymnsView students={students} />;
       case 'instruments':
-        return <InstrumentsView 
-          instruments={instruments} 
-          onAdd={handleAddInstrument} 
-          onDelete={handleDeleteInstrument} 
+        return <InstrumentsView
+          instruments={instruments}
+          onAdd={handleAddInstrument}
+          onDelete={handleDeleteInstrument}
         />;
       case 'methods_management':
-        return <MethodsManagementView 
+        return <MethodsManagementView
           methods={methods}
           onAdd={handleAddMethod}
           onDelete={handleDeleteMethod}
@@ -176,23 +191,23 @@ const App: React.FC = () => {
           <div className="space-y-8 animate-in fade-in duration-500">
             {/* Dashboard View */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <StatsCard 
-                title="Alunos Ativos" 
-                value={stats.active} 
-                icon={<UserCheck className="w-6 h-6" />} 
-                color="bg-blue-500" 
+              <StatsCard
+                title="Alunos Ativos"
+                value={stats.active}
+                icon={<UserCheck className="w-6 h-6" />}
+                color="bg-blue-500"
               />
-              <StatsCard 
-                title="Total de Alunos" 
-                value={stats.total} 
-                icon={<Users className="w-6 h-6" />} 
-                color="bg-slate-700" 
+              <StatsCard
+                title="Total de Alunos"
+                value={stats.total}
+                icon={<Users className="w-6 h-6" />}
+                color="bg-slate-700"
               />
-              <StatsCard 
-                title="Aptos p/ Orquestra" 
-                value={stats.ready} 
-                icon={<Star className="w-6 h-6" />} 
-                color="bg-amber-500" 
+              <StatsCard
+                title="Aptos p/ Orquestra"
+                value={stats.ready}
+                icon={<Star className="w-6 h-6" />}
+                color="bg-amber-500"
               />
             </div>
 
@@ -202,9 +217,9 @@ const App: React.FC = () => {
               </h2>
             </div>
 
-            <StudentList 
-              students={students} 
-              onSelectStudent={(s) => setSelectedStudentId(s.id)} 
+            <StudentList
+              students={students}
+              onSelectStudent={(s) => setSelectedStudentId(s.id)}
               availableInstruments={instruments.map(i => i.name)}
             />
           </div>
@@ -224,17 +239,17 @@ const App: React.FC = () => {
               </div>
               <h1 className="text-xl font-bold text-slate-900 tracking-tight">Sinfonia <span className="text-blue-600">CCB</span></h1>
             </div>
-            
+
             <div className="hidden md:flex items-center space-x-6">
               <nav className="flex space-x-1">
-                <button 
+                <button
                   onClick={() => navigateTo('dashboard')}
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentView === 'dashboard' && !selectedStudentId ? 'text-blue-600 bg-blue-50' : 'text-slate-500 hover:text-slate-900'}`}
                 >
                   Dashboard
                 </button>
                 <div className="relative group">
-                   <button 
+                  <button
                     className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center ${(currentView === 'methods_progress' || currentView === 'methods_management') ? 'text-blue-600' : 'text-slate-500'}`}
                   >
                     Métodos <ChevronDown className="w-4 h-4 ml-1" />
@@ -244,20 +259,20 @@ const App: React.FC = () => {
                     <button onClick={() => navigateTo('methods_management')} className="w-full text-left px-4 py-3 text-sm hover:bg-slate-50 text-slate-600 font-medium border-t border-slate-50">Cadastro Métodos</button>
                   </div>
                 </div>
-                <button 
+                <button
                   onClick={() => navigateTo('hymns')}
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentView === 'hymns' ? 'text-blue-600 bg-blue-50' : 'text-slate-500 hover:text-slate-900'}`}
                 >
                   Hinos
                 </button>
-                <button 
+                <button
                   onClick={() => navigateTo('instruments')}
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentView === 'instruments' ? 'text-blue-600 bg-blue-50' : 'text-slate-500 hover:text-slate-900'}`}
                 >
                   Instrumentos
                 </button>
               </nav>
-              <button 
+              <button
                 onClick={() => setIsNewStudentModalOpen(true)}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors flex items-center shadow-lg shadow-blue-100"
               >
@@ -287,14 +302,14 @@ const App: React.FC = () => {
 
       {/* Modals */}
       {isNewLessonModalOpen && (
-        <NewLessonModal 
+        <NewLessonModal
           onClose={() => setIsNewLessonModalOpen(false)}
           onSave={handleAddLesson}
         />
       )}
 
       {isNewStudentModalOpen && (
-        <NewStudentModal 
+        <NewStudentModal
           teachers={teachers}
           availableInstruments={instruments.map(i => i.name)}
           onClose={() => setIsNewStudentModalOpen(false)}
