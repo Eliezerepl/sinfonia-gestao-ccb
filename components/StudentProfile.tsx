@@ -1,8 +1,10 @@
 
 import React, { useState } from 'react';
 import { Student, Lesson, LearningPhase } from '../types';
-import { Calendar, ChevronLeft, CheckCircle, Clock, BookOpen, Music, Star, Edit3, PlusCircle } from 'lucide-react';
+import { Calendar, ChevronLeft, CheckCircle, Clock, BookOpen, Music, Star, Edit3, PlusCircle, FileText, Download } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 interface StudentProfileProps {
   student: Student;
@@ -19,6 +21,116 @@ const StudentProfile: React.FC<StudentProfileProps> = ({
   onToggleOrchestra,
   onUpdatePhase
 }) => {
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    // Header
+    doc.setFillColor(59, 130, 246); // Blue-600
+    doc.rect(0, 0, pageWidth, 40, 'F');
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(22);
+    doc.text('Relatorio Individual do Aluno', 15, 20);
+    doc.setFontSize(10);
+    doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')} as ${new Date().toLocaleTimeString('pt-BR')}`, 15, 30);
+
+    // Student Info Section
+    doc.setTextColor(30, 41, 59);
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text(student.name, 15, 55);
+
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    const info = [
+      ['Instrumento:', student.instrument],
+      ['Fase Atual:', student.phase],
+      ['Data de Matricula:', new Date(student.enrollmentDate).toLocaleDateString('pt-BR')],
+      ['Status Orquestra:', student.isOrchestraReady ? 'APTO' : 'EM ESTUDO']
+    ];
+
+    autoTable(doc, {
+      startY: 60,
+      head: [],
+      body: info,
+      theme: 'plain',
+      styles: { fontSize: 10, cellPadding: 2 },
+      columnStyles: { 0: { fontStyle: 'bold', cellWidth: 40 } }
+    });
+
+    // Summary Stats
+    const totalExercises = student.lessons.reduce((acc, curr) => acc + curr.exercisesMastered.length, 0);
+    const totalHymns = student.lessons.reduce((acc, curr) => acc + curr.hymnsMastered.length, 0);
+
+    doc.setFontSize(14);
+    doc.text('Resumo de Aproveitamento', 15, (doc as any).lastAutoTable.finalY + 15);
+
+    autoTable(doc, {
+      startY: (doc as any).lastAutoTable.finalY + 20,
+      head: [['Metrica', 'Total Realizado']],
+      body: [
+        ['Total de Aulas', student.lessons.length.toString()],
+        ['Exercicios Dominados', totalExercises.toString()],
+        ['Hinos Dominados', totalHymns.toString()]
+      ],
+      headStyles: { fillColor: [71, 85, 105] }
+    });
+
+    // Evolution Data Table
+    doc.addPage();
+    doc.setFontSize(14);
+    doc.text('Historico de Avaliacoes Tecnicas', 15, 20);
+
+    const evaluationData = student.lessons
+      .filter(l => l.evaluation)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .map(l => [
+        new Date(l.date).toLocaleDateString('pt-BR'),
+        l.evaluation?.technique.toString() || '-',
+        l.evaluation?.rhythm.toString() || '-',
+        l.evaluation?.reading.toString() || '-'
+      ]);
+
+    autoTable(doc, {
+      startY: 25,
+      head: [['Data', 'Tecnica', 'Ritmo', 'Leitura']],
+      body: evaluationData,
+      headStyles: { fillColor: [59, 130, 246] }
+    });
+
+    // Detailed Lessons History
+    doc.setFontSize(14);
+    doc.text('Detalhes das Ultimas Aulas', 15, (doc as any).lastAutoTable.finalY + 15);
+
+    const lessonDetails = student.lessons
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .map(l => [
+        new Date(l.date).toLocaleDateString('pt-BR'),
+        l.present ? 'Presente' : 'Faltou',
+        l.observation || '-',
+        [...l.exercisesMastered, ...l.hymnsMastered.map(h => `Hino ${h}`)].join(', ') || '-'
+      ]);
+
+    autoTable(doc, {
+      startY: (doc as any).lastAutoTable.finalY + 20,
+      head: [['Data', 'Presenca', 'Observacoes', 'Conteudo Dominado']],
+      body: lessonDetails,
+      headStyles: { fillColor: [15, 23, 42] },
+      columnStyles: { 2: { cellWidth: 50 }, 3: { cellWidth: 60 } }
+    });
+
+    // Footer on each page
+    const pageCount = (doc as any).internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150);
+      doc.text(`Sinfonia CCB - Gestao Musical | Pagina ${i} de ${pageCount}`, pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+    }
+
+    doc.save(`Relatorio_${student.name.replace(/\s+/g, '_')}.pdf`);
+  };
   const chartData = student.lessons
     .filter(l => l.evaluation)
     .map(l => ({
@@ -30,12 +142,21 @@ const StudentProfile: React.FC<StudentProfileProps> = ({
 
   return (
     <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-      <button
-        onClick={onBack}
-        className="flex items-center text-blue-600 hover:text-blue-800 font-medium mb-6 transition-colors"
-      >
-        <ChevronLeft className="w-5 h-5 mr-1" /> Voltar para lista
-      </button>
+      <div className="flex justify-between items-center mb-6">
+        <button
+          onClick={onBack}
+          className="flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors"
+        >
+          <ChevronLeft className="w-5 h-5 mr-1" /> Voltar para lista
+        </button>
+
+        <button
+          onClick={generatePDF}
+          className="flex items-center bg-white text-slate-700 px-4 py-2 rounded-xl border border-slate-200 font-bold hover:bg-slate-50 transition-all shadow-sm active:scale-95"
+        >
+          <Download className="w-4 h-4 mr-2" /> PDF Relatório
+        </button>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column: Basic Info & Stats */}
@@ -83,8 +204,8 @@ const StudentProfile: React.FC<StudentProfileProps> = ({
             <button
               onClick={onToggleOrchestra}
               className={`w-full mt-6 py-3 px-4 rounded-xl font-semibold flex items-center justify-center transition-all ${student.isOrchestraReady
-                  ? 'bg-amber-100 text-amber-700 border-2 border-amber-200 hover:bg-amber-200'
-                  : 'bg-slate-100 text-slate-600 border-2 border-slate-200 hover:bg-slate-200'
+                ? 'bg-amber-100 text-amber-700 border-2 border-amber-200 hover:bg-amber-200'
+                : 'bg-slate-100 text-slate-600 border-2 border-slate-200 hover:bg-slate-200'
                 }`}
             >
               <Star className={`w-5 h-5 mr-2 ${student.isOrchestraReady ? 'fill-current' : ''}`} />
