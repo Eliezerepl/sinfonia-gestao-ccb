@@ -103,53 +103,95 @@ const NewLessonModal: React.FC<NewLessonModalProps> = ({ methods, onClose, onSav
                 </label>
 
                 {/* Method Row 1 */}
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="col-span-2">
-                    <select
-                      value={selectedMethod1}
-                      onChange={e => setSelectedMethod1(e.target.value)}
-                      className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white transition-all overflow-hidden text-ellipsis"
-                    >
-                      <option value="">Selecione o Método 1</option>
-                      {methods.map(m => (
-                        <option key={m.id} value={m.name}>{m.name}</option>
-                      ))}
-                    </select>
+                <div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="col-span-2">
+                      <select
+                        value={selectedMethod1}
+                        onChange={e => setSelectedMethod1(e.target.value)}
+                        className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white transition-all overflow-hidden text-ellipsis"
+                      >
+                        <option value="">Selecione o Método 1</option>
+                        {methods.map(m => (
+                          <option key={m.id} value={m.name}>{m.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="col-span-1">
+                      <input
+                        type="number"
+                        value={exerciseNum1}
+                        onChange={e => setExerciseNum1(e.target.value)}
+                        placeholder="Lição"
+                        className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                      />
+                    </div>
                   </div>
-                  <div className="col-span-1">
-                    <input
-                      type="number"
-                      value={exerciseNum1}
-                      onChange={e => setExerciseNum1(e.target.value)}
-                      placeholder="Lição"
-                      className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white"
-                    />
-                  </div>
+                  {selectedMethod1 && (
+                    <div className="flex flex-wrap gap-2 mt-1.5 px-1">
+                      {methods.find(m => m.name === selectedMethod1)?.totalLessons ? (
+                        <span className="text-[9px] text-slate-500 bg-white border border-slate-200 px-1.5 py-0.5 rounded shadow-sm">
+                          Total: {methods.find(m => m.name === selectedMethod1)?.totalLessons} Lições
+                        </span>
+                      ) : null}
+                      {methods.find(m => m.name === selectedMethod1)?.totalExercises ? (
+                        <span className="text-[9px] text-slate-500 bg-white border border-slate-200 px-1.5 py-0.5 rounded shadow-sm">
+                          {methods.find(m => m.name === selectedMethod1)?.totalExercises} Exercícios
+                        </span>
+                      ) : null}
+                      {methods.find(m => m.name === selectedMethod1)?.hasPhases ? (
+                        <span className="text-[9px] text-blue-600 bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded font-bold shadow-sm">
+                          {methods.find(m => m.name === selectedMethod1)?.totalPhases} Fases
+                        </span>
+                      ) : null}
+                    </div>
+                  )}
                 </div>
 
                 {/* Method Row 2 */}
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="col-span-2">
-                    <select
-                      value={selectedMethod2}
-                      onChange={e => setSelectedMethod2(e.target.value)}
-                      className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white transition-all overflow-hidden text-ellipsis"
-                    >
-                      <option value="">Selecione o Método 2</option>
-                      {methods.map(m => (
-                        <option key={m.id} value={m.name}>{m.name}</option>
-                      ))}
-                    </select>
+                <div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="col-span-2">
+                      <select
+                        value={selectedMethod2}
+                        onChange={e => setSelectedMethod2(e.target.value)}
+                        className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white transition-all overflow-hidden text-ellipsis"
+                      >
+                        <option value="">Selecione o Método 2</option>
+                        {methods.map(m => (
+                          <option key={m.id} value={m.name}>{m.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="col-span-1">
+                      <input
+                        type="number"
+                        value={exerciseNum2}
+                        onChange={e => setExerciseNum2(e.target.value)}
+                        placeholder="Lição"
+                        className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                      />
+                    </div>
                   </div>
-                  <div className="col-span-1">
-                    <input
-                      type="number"
-                      value={exerciseNum2}
-                      onChange={e => setExerciseNum2(e.target.value)}
-                      placeholder="Lição"
-                      className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white"
-                    />
-                  </div>
+                  {selectedMethod2 && (
+                    <div className="flex flex-wrap gap-2 mt-1.5 px-1">
+                      {methods.find(m => m.name === selectedMethod2)?.totalLessons ? (
+                        <span className="text-[9px] text-slate-500 bg-white border border-slate-200 px-1.5 py-0.5 rounded shadow-sm">
+                          Total: {methods.find(m => m.name === selectedMethod2)?.totalLessons} Lições
+                        </span>
+                      ) : null}
+                      {methods.find(m => m.name === selectedMethod2)?.totalExercises ? (
+                        <span className="text-[9px] text-slate-500 bg-white border border-slate-200 px-1.5 py-0.5 rounded shadow-sm">
+                          {methods.find(m => m.name === selectedMethod2)?.totalExercises} Exercícios
+                        </span>
+                      ) : null}
+                      {methods.find(m => m.name === selectedMethod2)?.hasPhases ? (
+                        <span className="text-[9px] text-blue-600 bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded font-bold shadow-sm">
+                          {methods.find(m => m.name === selectedMethod2)?.totalPhases} Fases
+                        </span>
+                      ) : null}
+                    </div>
+                  )}
                 </div>
               </div>
 
