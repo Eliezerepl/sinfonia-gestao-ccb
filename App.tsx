@@ -178,7 +178,33 @@ const App: React.FC = () => {
     setSelectedStudentId(null);
   };
 
+  const SidebarItem: React.FC<{ view: ViewState; icon: React.ReactNode; label: string }> = ({ view, icon, label }) => {
+    const isActive = currentView === view && !selectedStudentId;
+    return (
+      <button
+        onClick={() => navigateTo(view)}
+        className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive
+            ? 'bg-blue-600 text-white shadow-lg shadow-blue-200 font-semibold'
+            : 'text-slate-500 hover:bg-slate-50 hover:text-blue-600 group'
+          }`}
+      >
+        <span className={`${isActive ? 'text-white' : 'text-slate-400 group-hover:text-blue-500'}`}>
+          {icon}
+        </span>
+        <span className="text-sm">{label}</span>
+      </button>
+    );
+  };
+
   const renderContent = () => {
+    if (isLoading) {
+      return (
+        <div className="flex items-center justify-center h-[60vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      );
+    }
+
     if (selectedStudent) {
       return (
         <StudentProfile
@@ -256,83 +282,98 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigateTo('dashboard')}>
-              <div className="bg-blue-600 p-2 rounded-lg">
-                <Music className="text-white w-6 h-6" />
-              </div>
-              <h1 className="text-xl font-bold text-slate-900 tracking-tight">Sinfonia <span className="text-blue-600">CCB</span></h1>
+    <div className="min-h-screen bg-slate-50 flex">
+      {/* Sidebar - Desktop */}
+      <aside className="hidden md:flex flex-col w-64 bg-white border-r border-slate-200 sticky top-0 h-screen">
+        <div className="p-6">
+          <div
+            className="flex items-center space-x-3 cursor-pointer group"
+            onClick={() => navigateTo('dashboard')}
+          >
+            <div className="bg-blue-600 p-2 rounded-xl group-hover:scale-110 transition-transform shadow-lg shadow-blue-100">
+              <Music className="text-white w-6 h-6" />
             </div>
-
-            <div className="hidden md:flex items-center space-x-6">
-              <nav className="flex space-x-1">
-                <button
-                  onClick={() => navigateTo('dashboard')}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentView === 'dashboard' && !selectedStudentId ? 'text-blue-600 bg-blue-50' : 'text-slate-500 hover:text-slate-900'}`}
-                >
-                  Dashboard
-                </button>
-                <div className="relative group">
-                  <button
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center ${(currentView === 'methods_progress' || currentView === 'methods_management') ? 'text-blue-600' : 'text-slate-500'}`}
-                  >
-                    Métodos <ChevronDown className="w-4 h-4 ml-1" />
-                  </button>
-                  <div className="absolute left-0 mt-2 w-48 bg-white border border-slate-100 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-40 overflow-hidden">
-                    <button onClick={() => navigateTo('methods_progress')} className="w-full text-left px-4 py-3 text-sm hover:bg-slate-50 text-slate-600 font-medium">Progresso Alunos</button>
-                    <button onClick={() => navigateTo('methods_management')} className="w-full text-left px-4 py-3 text-sm hover:bg-slate-50 text-slate-600 font-medium border-t border-slate-50">Cadastro Métodos</button>
-                  </div>
-                </div>
-                <button
-                  onClick={() => navigateTo('hymns')}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentView === 'hymns' ? 'text-blue-600 bg-blue-50' : 'text-slate-500 hover:text-slate-900'}`}
-                >
-                  Hinos
-                </button>
-                <button
-                  onClick={() => navigateTo('instruments')}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentView === 'instruments' ? 'text-blue-600 bg-blue-50' : 'text-slate-500 hover:text-slate-900'}`}
-                >
-                  Instrumentos
-                </button>
-                <button
-                  onClick={() => navigateTo('teachers')}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentView === 'teachers' ? 'text-blue-600 bg-blue-50' : 'text-slate-500 hover:text-slate-900'}`}
-                >
-                  Professores
-                </button>
-              </nav>
-              <button
-                onClick={() => setIsNewStudentModalOpen(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors flex items-center shadow-lg shadow-blue-100"
-              >
-                <Plus className="w-4 h-4 mr-2" /> Novo Aluno
-              </button>
-            </div>
-
-            {/* Mobile Nav */}
-            <div className="md:hidden flex items-center space-x-1">
-              <button onClick={() => navigateTo('methods_management')} className={`p-2 rounded-lg ${currentView === 'methods_management' ? 'text-blue-600 bg-blue-50' : 'text-slate-500'}`}>
-                <Book className="w-5 h-5" />
-              </button>
-              <button onClick={() => navigateTo('instruments')} className={`p-2 rounded-lg ${currentView === 'instruments' ? 'text-blue-600 bg-blue-50' : 'text-slate-500'}`}>
-                <Settings className="w-5 h-5" />
-              </button>
-              <button onClick={() => setIsNewStudentModalOpen(true)} className="bg-blue-600 text-white p-2 rounded-full shadow-lg">
-                <Plus className="w-5 h-5" />
-              </button>
+            <div>
+              <h1 className="text-lg font-bold text-slate-900 leading-none">Sinfonia <span className="text-blue-600">CCB</span></h1>
+              <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mt-0.5">Gestão Musical</p>
             </div>
           </div>
         </div>
-      </header>
 
-      <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {renderContent()}
-      </main>
+        <nav className="flex-1 px-4 space-y-2 py-4">
+          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4 mb-2">Principal</div>
+          <SidebarItem view="dashboard" icon={<LayoutDashboard className="w-5 h-5" />} label="Dashboard" />
+
+          <div className="pt-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4 mb-2">Cadastros</div>
+          <SidebarItem view="teachers" icon={<Users className="w-5 h-5" />} label="Professores" />
+          <SidebarItem view="instruments" icon={<Settings className="w-5 h-5" />} label="Instrumentos" />
+          <SidebarItem view="methods_management" icon={<BookOpen className="w-5 h-5" />} label="Métodos" />
+
+          <div className="pt-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4 mb-2">Acompanhamento</div>
+          <SidebarItem view="methods_progress" icon={<Library className="w-5 h-5" />} label="Progresso Alunos" />
+          <SidebarItem view="hymns" icon={<Music className="w-5 h-5" />} label="Hinos" />
+        </nav>
+
+        <div className="p-4 border-t border-slate-100">
+          <button
+            onClick={() => setIsNewStudentModalOpen(true)}
+            className="w-full bg-blue-600 text-white p-3 rounded-xl font-bold flex items-center justify-center shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95"
+          >
+            <Plus className="w-5 h-5 mr-2" /> Novo Aluno
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col min-h-screen">
+        {/* Mobile Header */}
+        <header className="md:hidden bg-white border-b border-slate-200 sticky top-0 z-30 p-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-2" onClick={() => navigateTo('dashboard')}>
+              <div className="bg-blue-600 p-1.5 rounded-lg">
+                <Music className="text-white w-5 h-5" />
+              </div>
+              <span className="font-bold text-slate-900">Sinfonia CCB</span>
+            </div>
+            <button
+              onClick={() => setIsNewStudentModalOpen(true)}
+              className="bg-blue-600 text-white p-2 rounded-full shadow-lg"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          </div>
+        </header>
+
+        <main className="flex-grow p-4 md:p-8 max-w-7xl w-full mx-auto">
+          {renderContent()}
+        </main>
+
+        {/* Mobile Bottom Navigation */}
+        <nav className="md:hidden bg-white border-t border-slate-200 sticky bottom-0 z-30 flex justify-around p-2">
+          <button onClick={() => navigateTo('dashboard')} className={`p-2 flex flex-col items-center ${currentView === 'dashboard' ? 'text-blue-600' : 'text-slate-400'}`}>
+            <LayoutDashboard className="w-6 h-6" />
+            <span className="text-[10px] mt-1">Home</span>
+          </button>
+          <button onClick={() => navigateTo('teachers')} className={`p-2 flex flex-col items-center ${currentView === 'teachers' ? 'text-blue-600' : 'text-slate-400'}`}>
+            <Users className="w-6 h-6" />
+            <span className="text-[10px] mt-1">Prof</span>
+          </button>
+          <button onClick={() => navigateTo('instruments')} className={`p-2 flex flex-col items-center ${currentView === 'instruments' ? 'text-blue-600' : 'text-slate-400'}`}>
+            <Settings className="w-6 h-6" />
+            <span className="text-[10px] mt-1">Inst</span>
+          </button>
+          <button onClick={() => navigateTo('methods_progress')} className={`p-2 flex flex-col items-center ${currentView === 'methods_progress' ? 'text-blue-600' : 'text-slate-400'}`}>
+            <Library className="w-6 h-6" />
+            <span className="text-[10px] mt-1">Prog</span>
+          </button>
+        </nav>
+
+        <footer className="hidden md:block py-6 px-8 text-center border-t border-slate-100">
+          <p className="text-sm text-slate-500 flex items-center justify-center">
+            Sistema de Gestão Musical <Music className="w-3 h-3 mx-1 text-blue-500" /> Versão 1.3.0
+          </p>
+        </footer>
+      </div>
 
       {/* Modals */}
       {isNewLessonModalOpen && (
@@ -350,14 +391,6 @@ const App: React.FC = () => {
           onSave={handleAddNewStudent}
         />
       )}
-
-      <footer className="bg-white border-t border-slate-200 py-6 mt-12">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-sm text-slate-500 flex items-center justify-center">
-            Sistema de Gestão Musical <Music className="w-3 h-3 mx-1 text-blue-500" /> Versão 1.2.0
-          </p>
-        </div>
-      </footer>
     </div>
   );
 };
